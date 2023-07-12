@@ -1,4 +1,7 @@
+// Implementacion del algoritmo BFS para un grafo no dirigido sin peso
+
 #include <iostream>
+#include <queue>
 #include <iomanip>
 
 using namespace std;
@@ -20,6 +23,7 @@ struct vertice
     int datoOrigen;
     arista *adyacente;
     vertice *sgtVertice; 
+    int ord = -1;
 };
 typedef vertice *pvertice;
 
@@ -28,6 +32,8 @@ class grafo
 {
     private:
         pvertice pGrafo;
+        int cont;
+        queue<pvertice> cola;
         int numVerts;
         int numAristas;
         
@@ -35,11 +41,12 @@ class grafo
         grafo();
         ~grafo();
         void insertarVertice(int);
-        void insertarAristas(int, int, int);
-        void insertarArista(int, int, int);
+        void insertarAristas(int, int);
+        void insertarArista(int, int);
         pvertice buscarVertice(int);
         parista buscarArista(int, int);
         void imprimirGrafo();
+        void BFS(int);
 };
 
 
@@ -90,14 +97,14 @@ void grafo::insertarVertice(int x)
 
 
 // Para grafo no dirigido
-void grafo::insertarAristas(int x, int y, int peso)
+void grafo::insertarAristas(int x, int y)
 {
-    insertarArista(x, y, peso);
-    insertarArista(y, x, peso);
+    insertarArista(x, y);
+    insertarArista(y, x);
 }
 
 
-void grafo::insertarArista(int x, int y, int peso)
+void grafo::insertarArista(int x, int y)
 {
     pvertice p;
     parista a;
@@ -108,7 +115,6 @@ void grafo::insertarArista(int x, int y, int peso)
         a = new arista;
         a->datoDestino = y;
         a->sgtArista = p->adyacente;
-        a->peso = peso;
         p->adyacente = a;
         numAristas++;
     } 
@@ -175,32 +181,84 @@ void grafo::imprimirGrafo()
 }
 
 
+void grafo::BFS(int r)
+{
+    // Inicializar contador del grafo
+    cont = 0;
+
+    pvertice p;
+    parista a;
+    p = buscarVertice(r);
+
+    // Insertar a la cola
+    cola.push(p);
+
+    // Mientras la cola no este vacia
+    while (!cola.empty())
+    {
+        // Sacar el elemento que este primero
+        pvertice v = cola.front();
+        cola.pop();
+
+        // Si vertice no visitado
+        if (v->ord == -1)
+        {
+            // Imprimir el recorrido
+            cout << v->datoOrigen << "  ";
+
+            // Actualizar ord
+            v->ord = cont++;
+            a = v->adyacente;
+
+            // Iterar sobre los vecinos de v
+            while (a != NULL)
+            {
+                // Vecino w
+                pvertice w = buscarVertice(a->datoDestino);
+                
+                if (w != NULL)
+                {
+                    // Insertar a la cola
+                    if (w->ord == -1)
+                        cola.push(w);
+                    
+                    // Siguiente arista
+                    a = a->sgtArista;
+                }
+            }
+        }
+    }
+}
+
+
+
 int main()
 {
     // Declarar grafo
     grafo g;
 
-    // Insertar los vertices
-    g.insertarVertice(4);
-    g.insertarVertice(6);
-    g.insertarVertice(3);
-    g.insertarVertice(1);
-    g.insertarVertice(2);
+    // Insertar los vertices (0-6)
+    for (int i = 6; i >= 0; i--)
+        g.insertarVertice(i);
 
     // Insertar las aristas para grafo dirigido
-    g.insertarArista(4, 6, 4);
-    g.insertarArista(3, 6, 10);
-    g.insertarArista(3, 4, 5);
-    g.insertarArista(1, 3, 7);
-    g.insertarArista(2, 6, 10);
-    g.insertarArista(1, 2, 1);
+    g.insertarAristas(0, 4);
+    g.insertarAristas(0, 1);
+    g.insertarAristas(1, 5);
+    g.insertarAristas(3, 6);
+    g.insertarAristas(3, 5);
+    g.insertarAristas(4, 6);
+    g.insertarAristas(5, 6);
   
 
     // Se imprime el grafo insertado
     print_format("Grafo Original");
     g.imprimirGrafo();
 
-    
+    // Se imprime el camino generado BFS
+    print_format("BFS del grafo dado");
+    cout << "Camino obtenido: ";
+    g.BFS(0);
 
     return 0;
 }
