@@ -94,6 +94,7 @@ void grafo::insertarAristas(int x, int y, int peso)
 {
     insertarArista(x, y, peso);
     insertarArista(y, x, peso);
+    numAristas++;
 }
 
 
@@ -110,7 +111,6 @@ void grafo::insertarArista(int x, int y, int peso)
         a->sgtArista = p->adyacente;
         a->peso = peso;
         p->adyacente = a;
-        numAristas++;
     } 
 }
 
