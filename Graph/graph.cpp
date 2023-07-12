@@ -1,3 +1,6 @@
+
+// Implementacion de la clase de un grafo no dirigido con peso
+
 #include <iostream>
 #include <iomanip>
 
